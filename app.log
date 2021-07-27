@@ -2647,3 +2647,9 @@
 2021-07-27 18:29:58 [EMER] [c:/Users/dmlt/Desktop/goWorkSpace/goServerTest/TGameServer/app/tserver/server.go:130] &{0xc000110500} Fatal error: %s EOF
 2021-07-27 18:29:58 [EMER] [c:/Users/dmlt/Desktop/goWorkSpace/goServerTest/TGameServer/app/tserver/server.go:71]  conn.Read error EOF
 2021-07-27 18:29:58 [DEBG] [c:/Users/dmlt/Desktop/goWorkSpace/goServerTest/TGameServer/app/tserver/server.go:118] Rmv client from Server => 127.0.0.1:50589   ClientCount => 0
+2021-07-27 19:46:15 [DEBG] [f:/TGame/TGameServer/manager/utils.go:17] Server port :54809
+2021-07-27 19:46:15 [DEBG] [f:/TGame/TGameServer/app/tserver/controller.go:71] RegisterController {User User map[Login:0xacf400 Register:0xacf660] <nil>}
+2021-07-27 19:46:15 [DEBG] [f:/TGame/TGameServer/app/tserver/controller.go:71] RegisterController {Room Room map[Chat:0xacedc0 JoinRoom:0xacefa0] <nil>}
+2021-07-27 19:46:15 [DEBG] [f:/TGame/TGameServer/app/tserver/controller.go:71] RegisterController {Game Game map[UpPos:0xacea80] <nil>}
+2021-07-27 19:46:15 [INFO] [f:/TGame/TGameServer/app/tserver/server.go:31] Starting Tcp Server :54809
+2021-07-27 19:46:15 [INFO] [f:/TGame/TGameServer/app/tserver/room.go:28] [0xc0000940e0]
