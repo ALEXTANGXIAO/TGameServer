@@ -54,7 +54,7 @@ func handBuffer(client *Client, buf []byte) error {
 		logger.Emer("marshal error: ", err.Error())
 		return err
 	}
-	logger.Info("Receive from client:", client.Conn.RemoteAddr(), mainPack)
+	logger.Crit("Receive from client:", client.Conn.RemoteAddr(), mainPack)
 
 	err2 := handleReq(client, mainPack, false)
 
@@ -91,12 +91,16 @@ func sendBuffer(client *Client, mainpack *GameProto.MainPack) (*GameProto.MainPa
 
 	buff := append(BufferHead, data...)
 
-	logger.Debug("send mainpack: ", conn.RemoteAddr(), mainpack)
+	logger.Crit(conn.RemoteAddr(), "send mainpack: ", mainpack)
 
-	logger.Debug("send buff: ", buff)
+	logger.Crit(conn.RemoteAddr(), "send buff: ", buff)
 
 	_, err2 := conn.Write(buff)
 
+	if err2 != nil {
+		logger.Emer(err2)
+		return nil, err2
+	}
 	return mainpack, err2
 }
 
@@ -166,4 +170,11 @@ func sendBufferTest(conn net.Conn) (*GameProto.MainPack, error) {
 	_, err2 := conn.Write(buff)
 
 	return mainpack, err2
+}
+
+func BuildProto(reqCode GameProto.RequestCode, action GameProto.ActionCode, retCode GameProto.ReturnCode) (*GameProto.MainPack, error) {
+	mainPack := &GameProto.MainPack{}
+	mainPack.Actioncode = action
+	mainPack.Returncode = retCode
+	return mainPack, nil
 }

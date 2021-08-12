@@ -2,14 +2,14 @@ package manager
 
 import (
 	"TGameServer/config"
-	"time"
 
 	"github.com/wonderivan/logger"
 )
 
 //挂起进程，防止销毁
 func Plot() {
-	time.Sleep(9999999999999999)
+	// time.Sleep(9999999999999999)
+	select {}
 }
 
 func SetLogger() {

@@ -20,6 +20,8 @@ var RoomList = []*Room{}
 var UDPConn *net.UDPConn
 var UDPAddr *net.UDPAddr
 
+var ConnMap = make(map[uint32]net.Conn)
+
 func StartServer(port string) Server {
 	server := Server{Port: port}
 	Start(server)
@@ -48,35 +50,39 @@ func Start(server Server) {
 			HandleClientUdp(UDPConn)
 		}
 	}()
-
+	var connid uint32
 	for {
 		// Here when listen an conn to New a Client !
 		conn, err := listener.Accept()
 		if err != nil {
+			logger.Emer("accept failed, err:", err)
 			continue
 		}
-		go handleClient(conn)
+		connid++
+		uniid := connid
+		ConnMap[uniid] = conn
+		go handleClient(conn, uniid)
 	}
 }
 
-func handleClient(conn net.Conn) {
+func handleClient(conn net.Conn, uniid uint32) {
 	defer conn.Close()
 
-	client := InstanceClient(conn)
-	AddClient(client)
+	client := InstanceClient(conn, uniid)
+	ClientList, _ = AddClient(client)
 	buf := make([]byte, 1024)
 	for {
 		cnt, err := conn.Read(buf)
 		if checkNetErr(err, conn) {
-			logger.Emer(" conn.Read error", err.Error())
+			logger.Emer(" conn.Read error", err)
 			RemoveClient(client)
-			return
+			break
 		}
 		err2 := handBuffer(client, buf[BufferHeadLength:cnt])
 		if checkNetErr(err2, conn) {
-			logger.Emer("handBuffer error", err2.Error())
+			logger.Emer("handBuffer error", err2)
 			RemoveClient(client)
-			return
+			break
 		}
 	}
 }
@@ -97,7 +103,7 @@ func GetClient(clientName string) (*Client, error) {
 			continue
 		}
 		if ClientList[i].Username == "" {
-			logger.Emer("Had client Username = nil↑", clientName)
+			logger.Emer("Had client Username = nil 👉", clientName)
 			ClientList[i].Username = clientName
 			return ClientList[i], nil
 			// continue
@@ -106,16 +112,18 @@ func GetClient(clientName string) (*Client, error) {
 			return ClientList[i], nil
 		}
 	}
-	for i := 0; i < len(ClientList); i++ {
-		logger.Emer(ClientList[i].Username)
-	}
-	logger.Emer("Had not client ↑", clientName)
-	return nil, errors.New("Had not client ↑")
+
+	logger.Emer("Had not client 👉", clientName)
+	return nil, errors.New("Had not client")
 }
 
 func RemoveClient(client *Client) {
 	ClientList = RemoveC(ClientList, client)
-	logger.Debug("Rmv client from Server =>", client.Addr, "  ClientCount =>", len(ClientList))
+	_, ok := ConnMap[client.Uniid]
+	if ok {
+		delete(ConnMap, client.Uniid)
+	}
+	logger.Debug("Rmv client from Server =>", client.Addr, "Uniid :=>", client.Uniid, "  ClientCount =>", len(ClientList))
 }
 
 func checkErr(err error) {
@@ -127,6 +135,7 @@ func checkErr(err error) {
 
 func checkNetErr(err error, conn net.Conn) bool {
 	if err != nil {
+		logger.Emer(conn.RemoteAddr())
 		logger.Emer(os.Stderr, "Fatal error: %s", err.Error())
 		return true
 	}

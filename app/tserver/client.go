@@ -17,13 +17,14 @@ type Client struct {
 	Username string
 	RoomInfo *Room
 	PosPack  *GameProto.PosPack
+	Uniid    uint32
 }
 
-func InstanceClient(conn net.Conn) *Client {
+func InstanceClient(conn net.Conn, uniid uint32) *Client {
 
 	rAddr := conn.RemoteAddr()
 
-	client := Client{Addr: rAddr.String(), Conn: conn}
+	client := Client{Addr: rAddr.String(), Conn: conn, Uniid: uniid}
 
 	return &client
 }

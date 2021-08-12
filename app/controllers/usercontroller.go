@@ -4,8 +4,6 @@ import (
 	GameProto "TGameServer/Gameproto"
 	server "TGameServer/app/tserver"
 	"errors"
-
-	"github.com/wonderivan/logger"
 )
 
 func InitUserController() {
@@ -23,11 +21,6 @@ func Login(client *server.Client, mainpack *GameProto.MainPack, isUdp bool) (*Ga
 	if CheckLogin(mainpack) {
 		mainpack.Returncode = GameProto.ReturnCode_Success
 		client.Username = mainpack.LoginPack.Username
-
-		logger.Info("Login Test ↓ UserName")
-		for i := 0; i < len(server.ClientList); i++ {
-			logger.Info(server.ClientList[i].Username)
-		}
 	} else {
 		mainpack.Returncode = GameProto.ReturnCode_Fail
 	}

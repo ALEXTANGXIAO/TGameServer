@@ -4,6 +4,8 @@ import (
 	GameProto "TGameServer/Gameproto"
 	server "TGameServer/app/tserver"
 	"errors"
+	"runtime"
+	"time"
 
 	"github.com/wonderivan/logger"
 )
@@ -47,14 +49,25 @@ func JoinRoom(client *server.Client, mainpack *GameProto.MainPack, isUdp bool) (
 		return nil, errors.New("client is nil")
 	}
 
-	if len(server.RoomList) == 0 {
-		logger.Error("RoomList count is empty")
-	} else {
-		room := server.RoomList[0]
-		client.RoomInfo = room
-		room.ClientList = append(room.ClientList, client)
-		room.Starting()
-	}
+	go func() {
+		ticker := time.NewTimer(time.Second * 1)
+		<-ticker.C //阻塞，1秒以后继续执行
+		ticker.Stop()
+		if len(server.RoomList) == 0 {
+			logger.Error("RoomList count is empty")
+		} else {
+			room := server.RoomList[0]
+			room.Join(client)
+		}
+		runtime.Goexit()
+	}()
+
+	// if len(server.RoomList) == 0 {
+	// 	logger.Error("RoomList count is empty")
+	// } else {
+	// 	room := server.RoomList[0]
+	// 	room.Join(client)
+	// }
 
 	if CheckLogin(mainpack) {
 		mainpack.Returncode = GameProto.ReturnCode_Success

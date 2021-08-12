@@ -12,6 +12,7 @@ func main() {
 	manager.SetLogger()
 	InitControllers()
 	go server.StartServer(config.TCPport)
+	go server.ListenCMD()
 	manager.Plot()
 }
 
